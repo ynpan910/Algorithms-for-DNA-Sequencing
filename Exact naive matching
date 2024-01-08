@@ -159,8 +159,37 @@ def aveQualityInOffsets (quals):
         qualityInOffsets.append(quality)
     return qualityInOffsets                    #the returned qualityInOffsets should be 100 in lenth
 
+#### plot out the average quality scors in each offset across all reads
+a = aveQualityInOffsets(quals)
 
+plt.plot(range(len(a)), a)  # plot
+plt.xlabel('offset across reads')
+plt.ylabel('average Quality score')
+plt.show()
 
+print(a)
 
+### 3. examine squencing bases
 
+#### define a function to get the number of 'N's in each offset across all reads
 
+def NsOffsets (seqs):
+    nN=[]
+    for i in range(100):
+        offsets=[s[i] for s in seqs]
+        n=0
+        for base in offsets:
+            if base=='N':
+                n+=1
+            
+            
+        nN.append(n)
+    return nN                           #the returned nN should be 100 in length
+
+#### plot out the total number of Ns in each offset across all reads
+b=NsOffsets(seqs)
+
+plt.plot(range(len(b)), b) #plot
+plt.xlabel('offset across reads')
+plt.ylabel('number of Ns')
+plt.show()
