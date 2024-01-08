@@ -7,9 +7,16 @@ filename = 'lambda_virus.fa'
 
 urllib.request.urlretrieve(url, filename)
 
+
+url = "http://d28rh4a8wq0iu5.cloudfront.net/ads1/data/ERR266411_1.first1000.fastq"
+filename = "ERR266411_1.first1000.fastq"
+
+urllib.request.urlretrieve(url, filename)
+
+
 #2. to anwer the questions, we need to first define some functions---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-##2.1 read the reference genome
+##2.1 read the reference genome (fa)
 def readGenome(filename):
     genome=''
     with open (filename, 'r') as f:
@@ -18,8 +25,27 @@ def readGenome(filename):
                 genome+=line.rstrip()
     return genome
 
+##2.2 read fastq file:
 
-##2.2 naive matching
+def readFastq (filename):
+    sequences=[]
+    qualities=[]
+    with open(filename) as fh:
+        while True:
+            fh.readline()
+            seq=fh.readline().rstrip()
+            fh.readline()
+            qual=fh.readline().rstrip()
+            if len(seq)==0:
+                break
+            sequences.append(seq)
+            qualities.append(qual)
+    return sequences, qualities
+##2.3 base quality
+def phred33ToQ (qual):
+    return ord(qual)-33
+
+##2.4 naive matching
 def naive(p, t): 
     occurences=[]  ##a list that keep the indices where p matches t
     for i in range(len(t)-len(p)+1): #outer loop. this loop over all positions in t that p could start, without running past the end of t
@@ -32,7 +58,7 @@ def naive(p, t):
             occurences.append(i)
     return occurences
 
-##2.3 get complementary reversed sequences
+##2.5 get complementary reversed sequences
 def reverseComplement(s):
     complement={'A':'T', 'C':'G', 'T':'A', 'G':'C', 'N':'N'}
     t=''
@@ -40,7 +66,7 @@ def reverseComplement(s):
         t=complement[base]+t
     return t
 
-##2.4 to find strand-awared exact naive matching of given strings in a ref genome. the function will return how many matches are there. Plus, if a string and its reverse complement are identical (e.g., AACGTT), only once will be reported.
+##2.6 to find strand-awared exact naive matching of given strings in a ref genome. the function will return how many matches are there. Plus, if a string and its reverse complement are identical (e.g., AACGTT), only once will be reported.
 
 nMatches=[]
 
@@ -89,4 +115,52 @@ def naive_2mm(p, t): #p could be 'word', and t could be a sentence
 
 ### use the defined fuction to answer the question
 naive_2mm('TTCAAGCC', genome)
+
+
+##q7:
+### read in the human1000 fastq file as seqs, quals
+seqs, quals=readFastq('SRR835775_1.first1000.fastq')
+
+### 1. examine each read's base quality (read-wise)
+
+##### define a function to draw a plot where x is index in a read and y axis is its quality score for the read.
+
+def scoreBasePlot(quals_read):
+    q_read=[] ##first, need to convert the ASCII base quality to integers and save it.
+    for phred in quals_read:
+        q=phred33ToQ(phred)
+        q_read.append(q)
+    plt.plot(range(len(q_read)), q_read) #plot
+    plt.xlabel('Index in a read')
+    plt.ylabel('Quality score')
+    plt.show()
+
+scoreBasePlot(quals[3])
+scoreBasePlot(quals[4])
+scoreBasePlot(quals[5])
+scoreBasePlot(quals[6])
+scoreBasePlot(quals[7])
+scoreBasePlot(quals[8])
+
+### 2. examine each offset's quality across all reads (offset-wise)
+
+#### define a function to calculate the average of quality scores in each offset across all reads
+
+def aveQualityInOffsets (quals):
+    qualityInOffsets=[]
+    for i in range(100):
+        offsets=[s[i] for s in quals]
+        q_offset=[]
+        for phred in offsets:
+            
+            q=phred33ToQ(phred)
+            q_offset.append(q)
+        quality=sum(q_offset) / len(q_offset)
+        qualityInOffsets.append(quality)
+    return qualityInOffsets                    #the returned qualityInOffsets should be 100 in lenth
+
+
+
+
+
 
