@@ -1,1 +1,44 @@
+#1.download fasta file. this is a reference genome for lamda virus
+import urllib.request
 
+url = 'http://d28rh4a8wq0iu5.cloudfront.net/ads1/data/lambda_virus.fa'
+
+filename = 'lambda_virus.fa'
+
+urllib.request.urlretrieve(url, filename)
+
+#2. define required functions
+
+#2.1 #read the reference genome
+def readGenome(filename):
+    genome=''
+    with open (filename, 'r') as f:
+        for line in f:
+            if not line[0]=='>':
+                genome+=line.rstrip()
+    return genome
+
+
+#2.2 naive matching
+def naive(p, t): 
+    occurences=[]  ##a list that keep the indices where p matches t
+    for i in range(len(t)-len(p)+1): #outer loop. this loop over all positions in t that p could start, without running past the end of t
+        match=True ##initialize the value
+        for j in range(len(p)):
+            if p[j]!=t[i+j]:
+                match=False
+                break #if we find the first character is not matched, we do not need to continue this round of inner loop, so put break
+        if match:
+            occurences.append(i)
+    return occurences
+
+#2.3 get complementary reversed sequences
+def reverseComplement(s):
+    complement={'A':'T', 'C':'G', 'T':'A', 'G':'C', 'N':'N'}
+    t=''
+    for base in s:
+        t=complement[base]+t
+    return t
+
+
+genome=readGenome('lambda_virus.fa')
