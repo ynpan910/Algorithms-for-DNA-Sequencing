@@ -7,7 +7,7 @@ filename = 'lambda_virus.fa'
 
 urllib.request.urlretrieve(url, filename)
 
-#2. define required functions---------------------------------------------------------------------------------------------------------------------------------------------------------------
+#2. to anwer the questions, we need to first define some functions---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ##2.1 read the reference genome
 def readGenome(filename):
@@ -55,9 +55,10 @@ def strandAwaredNaiveExactMatching (read, genome):
 
 #3. answering questions----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-##q1, q2:
 genome=readGenome('lambda_virus.fa')
 
+
+##q1, q2:
 read='TTAA'   #just need to change the strings given in the questions
 strandAwaredNaiveExactMatching(read, genome)
 
@@ -65,4 +66,27 @@ strandAwaredNaiveExactMatching(read, genome)
 print(naive('ACTAAGT', genome))
 print(naive(reverseComplement('ACTAAGT'), genome))
 
-##q5
+##q5, q6:
+
+### first, define a function to find APPROXIMATE MATCHES for P in T, which allows for <=2 differences, and do NOT consider the reverse complement here
+
+
+def naive_2mm(p, t): #p could be 'word', and t could be a sentence
+    occurences=[]  ##a list that keep the indices where p matches t
+    for i in range(len(t)-len(p)+1): #outer loop. this loop over all positions in t that p could start, without running past the end of t
+        match=True ##initialize the value
+        nMM=0 #the number of mismatch. Got this wrong at the first time by putting it inside the inner loop, that way nMM reset when comparing the next digit in p, which does not add up the total mismatch inside p.
+        for j in range(len(p)):
+            
+            if p[j]!=t[i+j]:
+                nMM+=1
+                if nMM>2:
+                    match=False
+                    break #if we find the first character is not matched, we do not need to continue this round of inner loop, so put break
+        if match:
+            occurences.append(i)
+    return occurences
+
+### use the defined fuction to answer the question
+naive_2mm('TTCAAGCC', genome)
+
