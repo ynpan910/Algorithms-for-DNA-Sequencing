@@ -1,4 +1,4 @@
-#1.download fasta file. this is a reference genome for lamda virus
+#1.download fasta file. this is a reference genome for lamda virus----------------------------------------------------------------------------------------------------------
 import urllib.request
 
 url = 'http://d28rh4a8wq0iu5.cloudfront.net/ads1/data/lambda_virus.fa'
@@ -7,7 +7,7 @@ filename = 'lambda_virus.fa'
 
 urllib.request.urlretrieve(url, filename)
 
-#2. define required functions
+#2. define required functions---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #2.1 #read the reference genome
 def readGenome(filename):
